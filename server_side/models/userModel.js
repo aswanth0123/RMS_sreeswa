@@ -27,10 +27,10 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['superadmin', 'tenant', 'shop', 'employee'],
-    default: 'superadmin',
+    enum: ['superadmin', 'tenant', 'shop', 'employee','user'],
+    default: 'user',
     required: [true, 'Role is required']
-  }
+  },
 }, {
   timestamps: true
 });
