@@ -6,6 +6,7 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true,
 });
 
 // Request interceptor to add auth token
@@ -49,6 +50,17 @@ export const shopAPI = {
   deleteShop: (id) => api.delete(`/shops/${id}`),
   getShopsByLocation: (place) => api.get(`/shops/location?place=${place}`),
   getActiveShops: () => api.get('/shops/active'),
+};
+
+export const productAPI = {
+  getAllProducts: () => api.get('/products'),
+  getProductById: (id) => api.get(`/products/${id}`),
+  createProduct: (productData) => api.post('/products', productData),
+  updateProduct: (id, productData) => api.put(`/products/${id}`, productData),
+  deleteProduct: (id) => api.delete(`/products/${id}`),
+  getProductsByShop: (shopId) => api.get(`/products/shop/${shopId}`),
+  getProductsByCategory: (category) => api.get(`/products/category/${category}`),
+  getProductsByMetalType: (metalType) => api.get(`/products/metal/${metalType}`),
 };
 
 export default api;

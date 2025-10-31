@@ -7,9 +7,11 @@ import { validateToken } from './store/slices/authSlice';
 import Login from './components/common/Login';
 import Layout from './components/layout/Layout';
 import Dashboard from './components/Dashboard';
+import UserDashboard from './components/UserDashboard';
 import Shops from './components/pages/Shops';
 import Employees from './components/pages/Employees';
 import Products from './components/pages/Products';
+import ProductCreate from './components/pages/ProductCreate';
 import Users from './components/pages/Users';
 import ProtectedRoute from './components/ProtectedRoute';
 import 'react-toastify/dist/ReactToastify.css';
@@ -29,8 +31,9 @@ const AppContent = () => {
   return (
     <div className="App">
       <Routes>
+        {/* Public landing page */}
+        <Route path="/" element={<UserDashboard />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/" element={<Login />} />
         
         {/* Protected Routes with Layout */}
         <Route 
@@ -69,6 +72,16 @@ const AppContent = () => {
             <ProtectedRoute>
               <Layout>
                 <Products />
+              </Layout>
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/products/new" 
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <ProductCreate />
               </Layout>
             </ProtectedRoute>
           } 

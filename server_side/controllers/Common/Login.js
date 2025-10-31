@@ -43,6 +43,15 @@ const loginController = async (req, res) => {
       { expiresIn: '24h' }
     );
 
+    // Set httpOnly auth cookie
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 24 * 60 * 60 * 1000,
+      path: '/',
+    });
+
     res.status(200).json({
       success: true,
       message: 'Login successful',
