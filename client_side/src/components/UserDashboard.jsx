@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { FiHeart, FiShoppingCart, FiUser, FiPhone, FiChevronDown, FiSearch, FiMenu, FiX } from 'react-icons/fi';
+import { FiHeart, FiShoppingCart, FiUser, FiPhone, FiChevronDown, FiChevronLeft, FiChevronRight, FiSearch, FiMenu, FiX } from 'react-icons/fi';
 
 const NAV_LINKS = [
   { label: 'Favorites', icon: FiHeart },
@@ -26,6 +26,21 @@ const CATEGORIES = [
     label: 'Silver',
     items: ['Coins', 'Chains', 'Bracelets', 'Rings', 'Necklaces'],
   },
+];
+
+const BANNERS = [
+  { type: 'image', src: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?q=80&w=1920&auto=format&fit=crop', alt: 'Jewellery Banner 1', title: 'Luxury Collection', subtitle: 'Discover timeless elegance' },
+  { type: 'image', src: 'https://images.unsplash.com/photo-1599643477877-530eb83abc8e?q=80&w=1920&auto=format&fit=crop', alt: 'Jewellery Banner 2', title: 'Exclusive Designs', subtitle: 'Crafted to perfection' },
+  { type: 'video', src: 'https://cdn.coverr.co/videos/coverr-woman-posing-with-jewelry-6408/1080p.mp4', alt: 'Jewellery Video', title: 'Premium Quality', subtitle: 'Your perfect choice' },
+];
+
+const FEATURED_CATEGORIES = [
+  { name: 'Best Sellers', image: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?q=80&w=800&auto=format&fit=crop', count: '150+' },
+  { name: 'New Arrivals', image: 'https://images.unsplash.com/photo-1506630448388-4e683c67ddb0?q=80&w=800&auto=format&fit=crop', count: '45+' },
+  { name: 'Coins & Bars', image: 'https://images.unsplash.com/photo-1621796378-13c53d19e6d1?q=80&w=800&auto=format&fit=crop', count: '80+' },
+  { name: 'Coin Pendants', image: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?q=80&w=800&auto=format&fit=crop', count: '60+' },
+  { name: 'Silver Coins', image: 'https://images.unsplash.com/photo-1621796378-13c53d19e6d1?q=80&w=800&auto=format&fit=crop', count: '90+' },
+  { name: 'Gold Jhumka', image: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?q=80&w=800&auto=format&fit=crop', count: '120+' },
 ];
 
 const TopBar = () => {
@@ -279,11 +294,139 @@ const CategoryBar = () => {
   );
 };
 
+const HeroCarousel = () => {
+  const [index, setIndex] = useState(0);
+  const timerRef = useRef(null);
+
+  useEffect(() => {
+    timerRef.current = setInterval(() => setIndex(i => (i + 1) % BANNERS.length), 6000);
+    return () => clearInterval(timerRef.current);
+  }, []);
+
+  const prev = () => {
+    setIndex(i => (i - 1 + BANNERS.length) % BANNERS.length);
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => setIndex(i => (i + 1) % BANNERS.length), 6000);
+  };
+
+  const next = () => {
+    setIndex(i => (i + 1) % BANNERS.length);
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => setIndex(i => (i + 1) % BANNERS.length), 6000);
+  };
+
+  const current = BANNERS[index];
+
+  return (
+    <div className="relative w-full rounded-2xl shadow-xl group">
+      <div className="relative h-[400px] sm:h-[500px] md:h-[600px]">
+        {current.type === 'image' ? (
+          <img
+            src={current.src}
+            alt={current.alt}
+            className="w-full h-full object-cover rounded-2xl"
+          />
+        ) : (
+          <video
+            className="w-full h-full object-cover rounded-2xl"
+            src={current.src}
+            autoPlay
+            muted
+            loop
+            playsInline
+          />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-transparent rounded-2xl" />
+        
+        <div className="absolute inset-0 flex items-center">
+          <div className="max-w-2xl px-6 sm:px-10 md:px-12 text-white">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3">
+              {current.title}
+            </h2>
+            <p className="text-lg sm:text-xl md:text-2xl text-gray-200 mb-6">
+              {current.subtitle}
+            </p>
+            <button className="px-6 py-3 bg-gradient-to-r from-yellow-500 to-amber-500 text-white font-semibold rounded-lg hover:from-yellow-600 hover:to-amber-600 transition-all shadow-lg hover:shadow-xl transform hover:scale-105">
+              Shop Now
+            </button>
+          </div>
+        </div>
+
+        <button
+          onClick={prev}
+          className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 p-3 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+        >
+          <FiChevronLeft className="w-6 h-6" />
+        </button>
+        <button
+          onClick={next}
+          className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 p-3 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+        >
+          <FiChevronRight className="w-6 h-6" />
+        </button>
+
+        <div className="absolute bottom-6 left-0 right-0 flex justify-center gap-2">
+          {BANNERS.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setIndex(i)}
+              className={`h-2 rounded-full transition-all ${
+                i === index ? 'w-8 bg-white' : 'w-2 bg-white/50 hover:bg-white/70'
+              }`}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const FeaturedSection = () => (
+  <div className="w-full mt-12">
+    <div className="flex items-center justify-between mb-6">
+      <div>
+        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Shop by Category</h2>
+        <p className="text-gray-600 mt-1">Explore our curated collections</p>
+      </div>
+      <button className="hidden sm:flex items-center gap-2 text-yellow-600 hover:text-yellow-700 font-medium">
+        View All
+        <FiChevronRight className="w-5 h-5" />
+      </button>
+    </div>
+
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6">
+      {FEATURED_CATEGORIES.map((cat) => (
+        <div
+          key={cat.name}
+          className="group relative overflow-hidden rounded-xl shadow-md hover:shadow-xl transition-all transform hover:scale-105 cursor-pointer"
+        >
+          <div className="aspect-square relative">
+            <img
+              src={cat.image}
+              alt={cat.name}
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+            <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
+              <h3 className="font-semibold text-sm sm:text-base mb-1">{cat.name}</h3>
+              <p className="text-xs text-gray-200">{cat.count} items</p>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
 const UserDashboard = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <TopBar />
       <CategoryBar />
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <HeroCarousel />
+        <FeaturedSection />
+      </main>
     </div>
   );
 };
