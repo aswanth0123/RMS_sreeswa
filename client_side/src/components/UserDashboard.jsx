@@ -1,6 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { FiHeart, FiShoppingCart, FiUser, FiPhone, FiChevronDown, FiChevronLeft, FiChevronRight, FiSearch, FiMenu, FiX } from 'react-icons/fi';
+import { Link, useNavigate } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { logoutUser } from '../store/slices/authSlice';
+import { FiHeart, FiShoppingCart, FiUser, FiPhone, FiChevronDown, FiChevronLeft, FiChevronRight, FiSearch, FiMenu, FiX, FiLogOut, FiSettings } from 'react-icons/fi';
 
 const NAV_LINKS = [
   { label: 'Favorites', icon: FiHeart },
@@ -47,6 +50,9 @@ const TopBar = () => {
   const [openProfile, setOpenProfile] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { isAuthenticated, user } = useSelector((state) => state.auth);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -57,6 +63,17 @@ const TopBar = () => {
     document.addEventListener('click', handleClickOutside);
     return () => document.removeEventListener('click', handleClickOutside);
   }, [openProfile]);
+
+  const handleLogout = async () => {
+    try {
+      await dispatch(logoutUser()).unwrap();
+      setOpenProfile(false);
+      navigate('/');
+    } catch (error) {
+      setOpenProfile(false);
+      navigate('/');
+    }
+  };
 
   return (
     <div className="w-full bg-white shadow-sm sticky top-0 z-50 border-b border-gray-100">
@@ -90,49 +107,75 @@ const TopBar = () => {
             </div>
           </div>
 
-          <div className="hidden md:flex items-center gap-4">
-            {NAV_LINKS.filter(n => n.label !== 'Profile').map(n => {
-              const Icon = n.icon;
-              return (
-                <button
-                  key={n.label}
-                  className="relative flex items-center gap-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors"
-                >
-                  <Icon className="w-5 h-5" />
-                  <span className="text-sm font-medium">{n.label}</span>
-                  {n.label === 'Cart' && (
-                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-yellow-500 text-white text-xs rounded-full flex items-center justify-center font-bold">
-                      0
-                    </span>
-                  )}
-                </button>
-              );
-            })}
+          <div className="flex items-center gap-2 md:gap-4">
+            <div className="hidden md:flex items-center gap-4">
+              {NAV_LINKS.filter(n => n.label !== 'Profile').map(n => {
+                const Icon = n.icon;
+                return (
+                  <button
+                    key={n.label}
+                    className="relative flex items-center gap-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors"
+                  >
+                    <Icon className="w-5 h-5" />
+                    <span className="text-sm font-medium">{n.label}</span>
+                    {n.label === 'Cart' && (
+                      <span className="absolute -top-1 -right-1 w-5 h-5 bg-yellow-500 text-white text-xs rounded-full flex items-center justify-center font-bold">
+                        0
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
 
             <div className="relative profile-dropdown">
               <button
                 onClick={() => setOpenProfile(!openProfile)}
-                className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors"
+                className="flex items-center gap-1 md:gap-2 px-2 md:px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors"
               >
                 <FiUser className="w-5 h-5" />
-                <span className="text-sm font-medium">Profile</span>
+                <span className="hidden md:inline text-sm font-medium">Profile</span>
                 <FiChevronDown className={`w-4 h-4 transition-transform ${openProfile ? 'rotate-180' : ''}`} />
               </button>
               {openProfile && (
                 <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-xl z-50 overflow-hidden">
                   <div className="p-2">
-                    <a
-                      href="/login"
-                      className="block px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-md transition-colors"
-                    >
-                      Sign In
-                    </a>
-                    <a
-                      href="/login"
-                      className="block px-4 py-2.5 text-sm font-medium bg-gradient-to-r from-yellow-500 to-amber-500 text-white hover:from-yellow-600 hover:to-amber-600 rounded-md transition-colors text-center"
-                    >
-                      Sign Up
-                    </a>
+                    {isAuthenticated ? (
+                      <>
+                        <Link
+                          to="/account"
+                          onClick={() => setOpenProfile(false)}
+                          className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-md transition-colors"
+                        >
+                          <FiSettings className="w-4 h-4" />
+                          Account
+                        </Link>
+                        <button
+                          onClick={handleLogout}
+                          className="w-full flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                        >
+                          <FiLogOut className="w-4 h-4" />
+                          Logout
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <Link
+                          to="/user/login"
+                          onClick={() => setOpenProfile(false)}
+                          className="block px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 rounded-md transition-colors"
+                        >
+                          Sign In
+                        </Link>
+                        <Link
+                          to="/user/signup"
+                          onClick={() => setOpenProfile(false)}
+                          className="block px-4 py-2.5 text-sm font-medium bg-gradient-to-r from-yellow-500 to-amber-500 text-white hover:from-yellow-600 hover:to-amber-600 rounded-md transition-colors text-center"
+                        >
+                          Sign Up
+                        </Link>
+                      </>
+                    )}
                   </div>
                 </div>
               )}
@@ -154,7 +197,7 @@ const TopBar = () => {
                 />
               </div>
               <div className="flex flex-wrap gap-2 mt-2">
-                {NAV_LINKS.map(n => {
+                {NAV_LINKS.filter(n => n.label !== 'Profile').map(n => {
                   const Icon = n.icon;
                   return (
                     <button
@@ -177,7 +220,7 @@ const TopBar = () => {
 
 const CategoryBar = () => {
   const [activeDropdown, setActiveDropdown] = useState(null);
-  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 240 });
   const buttonRefs = useRef({});
   const timeoutRef = useRef(null);
 
@@ -197,9 +240,24 @@ const CategoryBar = () => {
         const button = buttonRefs.current[activeDropdown];
         if (button) {
           const rect = button.getBoundingClientRect();
+          const windowWidth = window.innerWidth;
+          const padding = 16;
+          const dropdownWidth = Math.min(240, windowWidth - 32);
+          
+          let left = rect.left;
+          
+          if (left + dropdownWidth > windowWidth - padding) {
+            left = windowWidth - dropdownWidth - padding;
+          }
+          
+          if (left < padding) {
+            left = padding;
+          }
+          
           setDropdownPosition({
             top: rect.bottom + 8,
-            left: rect.left,
+            left: left,
+            width: dropdownWidth,
           });
         }
       };
@@ -233,8 +291,8 @@ const CategoryBar = () => {
   return (
     <>
       <div className="w-full bg-gradient-to-r from-gray-50 to-white border-b border-gray-100 sticky top-16 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-          <div className="flex items-center justify-center gap-2 py-3 overflow-x-auto hide-scrollbar">
+        <div className="w-full relative">
+          <div className="flex items-center gap-2 py-3 overflow-x-auto hide-scrollbar px-4 sm:px-6 lg:px-8 lg:justify-center" style={{ WebkitOverflowScrolling: 'touch' }}>
             {CATEGORIES.map(cat => (
               <div
                 key={cat.label}
@@ -248,7 +306,7 @@ const CategoryBar = () => {
                     e.stopPropagation();
                     setActiveDropdown(activeDropdown === cat.label ? null : cat.label);
                   }}
-                  className={`flex items-center gap-1.5 px-4 py-2 rounded-lg font-medium text-sm border transition-colors ${
+                  className={`flex items-center gap-1.5 px-4 py-2 rounded-lg font-medium text-sm border transition-colors whitespace-nowrap ${
                     activeDropdown === cat.label
                       ? 'bg-white text-yellow-600 border-yellow-200'
                       : 'text-gray-700 border-transparent hover:bg-white hover:text-yellow-600 hover:border-yellow-200'
@@ -264,10 +322,12 @@ const CategoryBar = () => {
       </div>
       {activeDropdown && createPortal(
         <div
-          className="fixed bg-white border border-gray-200 rounded-lg shadow-xl overflow-hidden p-4 grid grid-cols-2 gap-3 min-w-[240px] z-50 category-dropdown-menu"
+          className="fixed bg-white border border-gray-200 rounded-lg shadow-xl overflow-hidden p-4 grid grid-cols-2 gap-3 z-50 category-dropdown-menu"
           style={{
             top: `${dropdownPosition.top}px`,
             left: `${dropdownPosition.left}px`,
+            width: `${dropdownPosition.width}px`,
+            maxWidth: 'calc(100vw - 32px)',
           }}
           onMouseEnter={() => {
             if (timeoutRef.current) {

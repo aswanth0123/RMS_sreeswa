@@ -5,6 +5,8 @@ import { ToastContainer } from 'react-toastify';
 import { store } from './store/store';
 import { validateToken } from './store/slices/authSlice';
 import Login from './components/common/Login';
+import UserLogin from './components/user/UserLogin';
+import UserSignUp from './components/user/UserSignUp';
 import Layout from './components/layout/Layout';
 import Dashboard from './components/Dashboard';
 import UserDashboard from './components/UserDashboard';
@@ -34,6 +36,11 @@ const AppContent = () => {
         {/* Public landing page */}
         <Route path="/" element={<UserDashboard />} />
         <Route path="/login" element={<Login />} />
+        
+        {/* User authentication pages */}
+        <Route path="/user/login" element={<UserLogin />} />
+        <Route path="/user/signup" element={<UserSignUp />} />
+        <Route path="/signup" element={<UserSignUp />} />
         
         {/* Protected Routes with Layout */}
         <Route 

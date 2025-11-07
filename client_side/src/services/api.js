@@ -38,7 +38,8 @@ api.interceptors.response.use(
 // Auth API endpoints
 export const authAPI = {
   login: (credentials) => api.post('/auth/login', credentials),
-  // Add other auth endpoints as needed
+  signup: (userData) => api.post('/auth/signup', userData),
+  logout: () => api.post('/auth/logout'),
 };
 
 // Shop API endpoints

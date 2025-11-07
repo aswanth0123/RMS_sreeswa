@@ -14,6 +14,19 @@ export const loginUser = createAsyncThunk(
   }
 );
 
+// Async thunk for logout
+export const logoutUser = createAsyncThunk(
+  'auth/logoutUser',
+  async (_, { rejectWithValue }) => {
+    try {
+      await authAPI.logout();
+      return { success: true };
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Logout failed');
+    }
+  }
+);
+
 // Async thunk for token validation
 export const validateToken = createAsyncThunk(
   'auth/validateToken',
@@ -104,6 +117,28 @@ const authSlice = createSlice({
         state.user = null;
         state.token = null;
         state.error = null;
+        localStorage.removeItem('token');
+        localStorage.removeItem('userData');
+      })
+      .addCase(logoutUser.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(logoutUser.fulfilled, (state) => {
+        state.isLoading = false;
+        state.isAuthenticated = false;
+        state.user = null;
+        state.token = null;
+        state.error = null;
+        localStorage.removeItem('token');
+        localStorage.removeItem('userData');
+      })
+      .addCase(logoutUser.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isAuthenticated = false;
+        state.user = null;
+        state.token = null;
+        state.error = action.payload;
         localStorage.removeItem('token');
         localStorage.removeItem('userData');
       });

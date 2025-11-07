@@ -3,18 +3,16 @@ import User from '../../models/userModel.js';
 
 const loginController = async (req, res) => {
   try {
-    const { username, password } = req.body;
-    console.log(username,password,'username,password');
+    const { email, password } = req.body;
     
-    if (!username || !password) {
+    if (!email || !password) {
       return res.status(400).json({
         success: false,
-        message: 'Username and password are required'
+        message: 'Email and password are required'
       });
     }
 
-    const user = await User.findOne({ username });
-    console.log(user,'user');
+    const user = await User.findOne({ username: email.toLowerCase() });
     
     if (!user) {
       return res.status(401).json({
@@ -24,14 +22,13 @@ const loginController = async (req, res) => {
     }
 
     const isPasswordValid = await user.comparePassword(password);
-    console.log(isPasswordValid,'isPasswordValid');
+    
     if (!isPasswordValid) {
       return res.status(401).json({
         success: false,
         message: 'Invalid credentials'
       });
     }
-    console.log(user._id,'user._id');
     
     const token = jwt.sign(
       { 
